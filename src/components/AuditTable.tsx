@@ -275,14 +275,12 @@ const AuditTable: React.FC<AuditTableProps> = ({
                     key={column.key} 
                     onClick={() => handleSortChange(column.key)} 
                     className={cn(
-                      "whitespace-pre-wrap text-xs py-2.5 cursor-pointer min-w-[100px] max-w-[150px] text-center", 
+                      "whitespace-nowrap text-xs py-2.5 cursor-pointer", 
                       sortColumn === column.key ? "bg-blue-50 text-blue-700" : "bg-gray-50"
                     )}
                   >
-                    <div className="flex items-center justify-center">
-                      {column.title.length > 12 
-                        ? column.title.replace(/\s+/g, '\n')
-                        : column.title}
+                    <div className="flex items-center">
+                      {column.title}
                       {renderSortIndicator(column.key)}
                     </div>
                   </TableHead>
@@ -296,7 +294,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                     if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
                       return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
                         <Select defaultValue={item.allocation} onValueChange={value => handleAllocationChange(item.id, value)}>
-                          <SelectTrigger className="w-[120px] h-6 text-xs mx-auto">
+                          <SelectTrigger className="w-[120px] h-6 text-xs">
                             <SelectValue placeholder="Select" />
                           </SelectTrigger>
                           <SelectContent>
@@ -308,7 +306,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                       </TableCell>;
                     }
                     if (column.key === 'fieldReport') {
-                      return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
+                      return <TableCell key={`${item.id}-${column.key}`} className="py-1">
                         <Button size="sm" className={cn(
                           "text-white text-xs px-2.5 py-0.5 h-6 gap-1.5", 
                           item.status === 'Completed' 
@@ -322,7 +320,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                       </TableCell>;
                     }
                     if (column.key === 'status') {
-                      return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
+                      return <TableCell key={`${item.id}-${column.key}`} className="py-1">
                         <span className={cn("px-2.5 py-0.5 rounded text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
                           {item.status}
                         </span>

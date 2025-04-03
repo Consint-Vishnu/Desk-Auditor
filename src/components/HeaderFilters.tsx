@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -18,7 +19,7 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
 
-  const handleFilterApply = (filters: unknown) => {
+  const handleFilterApply = (filters: any) => {
     setAppliedFilters(filters);
     onFilter({
       hospital,
