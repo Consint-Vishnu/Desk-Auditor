@@ -139,5 +139,25 @@ export const mockAuditData = [
     aiManualTrigger: 'Manual',
     allocation: 'RO Admin 2',
     fieldReport: 'Download Report'
+  },
+  {
+    id: '8',
+    claimNumber: '69698',
+    claimDate: '13-02-2025',
+    hospitalName: 'City Hospital',
+    hospitalLocation: 'Tamil Nadu',
+    htpaLocation: 'Chennai',
+    dateOfAdmission: '30-01-2025',
+    dateOfDischarge: '03-02-2025',
+    fraudTriggers: 'Billing Discrepancy',
+    fieldInvestigationDate: '02-03-2025',
+    claimStatus: 'Completed',
+    status: 'Completed',
+    deskAuditReferralDate: '03-03-2025',
+    taTCompliance: '+1 Days',
+    claimIntimationAging: '+3 Days',
+    aiManualTrigger: 'Manual',
+    allocation: 'RO Admin 2',
+    fieldReport: 'Download Report'
   }
 ];

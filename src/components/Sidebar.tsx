@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronRight, FileText, Clock, Users, Settings, LogOut, ChevronLeft } from 'lucide-react';
@@ -21,7 +20,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ icon, href, isActive, label }
       to={href}
       className={cn(
         "w-full h-12 flex items-center px-4 text-white transition-all duration-200",
-        isActive ? "bg-blue-700" : "hover:bg-blue-700"
+        isActive ? "bg-[#477FC0]" : "hover:bg-[#033B77]"
       )}
     >
       <div className="flex items-center gap-3">
@@ -51,22 +50,22 @@ const Sidebar: React.FC = () => {
   return (
     <div 
       className={cn(
-        "flex flex-col h-screen fixed left-0 top-0 z-10 bg-blue-600 transition-all duration-300",
+        "flex flex-col h-screen fixed left-0 top-0 z-10 bg-[#3472BA] transition-all duration-300",
         expanded ? "w-64" : "w-[50px]"
       )}
     >
-      <div className="flex items-center h-16 px-4 border-b border-blue-700">
+      <div className="flex items-center h-16 px-4 border-b border-[#477FC0]">
         {expanded ? (
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-blue-600 font-bold">
+              <div className="h-8 w-8 bg-white rounded-full flex items-center justify-center text-[#3472BA] font-bold">
                 H
               </div>
               <span className="text-white font-bold text-lg">HITPA</span>
             </div>
             <button 
               onClick={() => setExpanded(false)}
-              className="text-white hover:bg-blue-700 p-1 rounded-full"
+              className="text-white hover:bg-[#033B77] p-1 rounded-full"
             >
               <ChevronLeft size={20} />
             </button>
@@ -74,7 +73,7 @@ const Sidebar: React.FC = () => {
         ) : (
           <button 
             onClick={() => setExpanded(true)}
-            className="text-white w-full flex justify-center hover:bg-blue-700"
+            className="text-white w-full flex justify-center hover:bg-[#033B77]"
           >
             <ChevronRight size={20} />
           </button>
@@ -118,7 +117,7 @@ const Sidebar: React.FC = () => {
                     to={`/dashboard/${role}`}
                     className={cn(
                       "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
-                      isActive('dashboard') ? "bg-blue-700" : "hover:bg-blue-700"
+                      isActive('dashboard') ? "bg-[#477FC0]" : "hover:bg-[#033B77]"
                     )}
                   >
                     <FileText size={20} />
@@ -133,7 +132,7 @@ const Sidebar: React.FC = () => {
                     to={`/history/${role}`}
                     className={cn(
                       "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
-                      isActive('history') ? "bg-blue-700" : "hover:bg-blue-700"
+                      isActive('history') ? "bg-[#477FC0]" : "hover:bg-[#033B77]"
                     )}
                   >
                     <Clock size={20} />
@@ -148,7 +147,7 @@ const Sidebar: React.FC = () => {
                     to={`/users/${role}`}
                     className={cn(
                       "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
-                      isActive('users') ? "bg-blue-700" : "hover:bg-blue-700"
+                      isActive('users') ? "bg-[#477FC0]" : "hover:bg-[#033B77]"
                     )}
                   >
                     <Users size={20} />
@@ -163,7 +162,7 @@ const Sidebar: React.FC = () => {
                     to={`/settings/${role}`}
                     className={cn(
                       "w-10 h-10 flex items-center justify-center text-white rounded-md my-1",
-                      isActive('settings') ? "bg-blue-700" : "hover:bg-blue-700"
+                      isActive('settings') ? "bg-[#477FC0]" : "hover:bg-[#033B77]"
                     )}
                   >
                     <Settings size={20} />
@@ -176,11 +175,11 @@ const Sidebar: React.FC = () => {
         )}
       </div>
       
-      <div className="mt-auto border-t border-blue-700">
+      <div className="mt-auto border-t border-[#477FC0]">
         {expanded ? (
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 h-12 text-white hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-3 w-full px-4 h-12 text-white hover:bg-[#033B77] transition-colors"
           >
             <LogOut size={18} />
             <span className="text-sm font-medium">Logout</span>
@@ -191,7 +190,7 @@ const Sidebar: React.FC = () => {
               <TooltipTrigger asChild>
                 <button 
                   onClick={handleLogout}
-                  className="flex items-center justify-center w-full h-12 text-white hover:bg-blue-700 transition-colors"
+                  className="flex items-center justify-center w-full h-12 text-white hover:bg-[#033B77] transition-colors"
                 >
                   <LogOut size={20} />
                 </button>

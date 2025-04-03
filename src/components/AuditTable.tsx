@@ -194,15 +194,15 @@ const AuditTable: React.FC<AuditTableProps> = ({
   };
 
   const renderPaginationNumbers = () => {
-    let pages = [];
+    const pages = [];
     if (totalPages <= 5) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
       pages.push(1);
-      let startPage = Math.max(2, currentPage - 1);
-      let endPage = Math.min(totalPages - 1, currentPage + 1);
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
       if (startPage > 2) {
         pages.push(-1);
       }
@@ -311,8 +311,9 @@ const AuditTable: React.FC<AuditTableProps> = ({
                       return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
                         <Button size="sm" className={cn(
                           "text-white text-xs px-2.5 py-0.5 h-6 gap-1.5", 
-                          item.status === 'Pending' 
-                            ? "bg-blue-500 hover:bg-blue-600" 
+                          item.status === 'Completed' 
+                            ?
+                             "bg-blue-500 hover:bg-blue-600" 
                             : "bg-gray-400 hover:bg-gray-500"
                         )}>
                           <Download size={12} />
@@ -322,7 +323,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                     }
                     if (column.key === 'status') {
                       return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
-                        <span className={cn("px-2.5 py-0.5 rounded-full text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
+                        <span className={cn("px-2.5 py-0.5 rounded text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
                           {item.status}
                         </span>
                       </TableCell>;

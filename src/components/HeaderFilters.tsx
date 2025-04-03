@@ -7,7 +7,7 @@ import { Download, Filter } from 'lucide-react';
 import FilterPanel from './FilterPanel';
 
 interface HeaderFiltersProps {
-  onFilter: (filters: any) => void;
+  onFilter: (filters: unknown) => void;
   onExport: () => void;
 }
 
@@ -18,7 +18,7 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
   const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
 
-  const handleFilterApply = (filters: any) => {
+  const handleFilterApply = (filters: unknown) => {
     setAppliedFilters(filters);
     onFilter({
       hospital,
@@ -69,7 +69,7 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
                   setDateFrom(e.target.value);
                   handleBasicFilterChange();
                 }}
-                className="w-full md:w-[140px] h-8 text-xs"
+                className="w-full md:w-[150px] h-8 text-xs"
               />
               <span className="text-gray-500 text-xs">to</span>
               <Input
@@ -80,7 +80,7 @@ const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => 
                   setDateTo(e.target.value);
                   handleBasicFilterChange();
                 }}
-                className="w-full md:w-[140px] h-8 text-xs"
+                className="w-full md:w-[150px] h-8 text-xs"
               />
             </div>
           </div>
