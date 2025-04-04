@@ -8,7 +8,6 @@ import { ArrowDown, ArrowUp, Search, Download } from 'lucide-react';
 import ColumnVisibilityDropdown from './ColumnVisibilityDropdown';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
-// import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AuditData {
   id: string;
@@ -68,10 +67,12 @@ const AuditTable: React.FC<AuditTableProps> = ({
     }, {
       key: 'htpaLocation',
       title: 'HTPA Location'
-    }, {
+    },
+     {
       key: 'dateOfAdmission',
       title: 'Date of Admission'
-    }, {
+    },
+     {
       key: 'dateOfDischarge',
       title: 'Date of Discharge'
     }, {
@@ -121,8 +122,8 @@ const AuditTable: React.FC<AuditTableProps> = ({
       hospitalName: true,
       hospitalLocation: true,
       htpaLocation: true,
-      dateOfAdmission: true,
-      dateOfDischarge: true,
+      // dateOfAdmission: true,
+      // dateOfDischarge: true,
       status: true,
       fieldReport: true
     };
@@ -276,88 +277,95 @@ const AuditTable: React.FC<AuditTableProps> = ({
             <ColumnVisibilityDropdown columns={allColumns} visibleColumns={visibleColumns} setVisibleColumns={setVisibleColumns} />
           </div>
           
-          <div className="overflow-x-auto flex-grow">
-              <div className="min-w-max">
-                <Table className="text-xs border-collapse table-auto w-full font-poppins">
-                  <TableHeader>
-                    <TableRow className="h-10">
-                      {displayColumns.map(column => (
-                        <TableHead 
-                          key={column.key} 
-                          onClick={() => handleSortChange(column.key)} 
-                          className={cn(
-                            "whitespace-no-wrap text-xs py-2 cursor-pointer text-center", 
-                            sortColumn === column.key ? "bg-blue-50 text-blue-700" : "bg-gray-50"
-                          )}
-                        >
-                          <div className="flex items-center">
-                            {column.title}
-                            {renderSortIndicator(column.key)}
-                          </div>
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {currentItems.length > 0 ? currentItems.map(item => (
-                    <TableRow key={item.id} className="h-8 hover:bg-gray-50">
-                      {displayColumns.map(column => {
-                        if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
-                          return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
-                            <Select defaultValue={item.allocation} onValueChange={value => handleAllocationChange(item.id, value)}>
-                              <SelectTrigger className="w-[120px] h-6 text-xs">
-                                <SelectValue placeholder="Select" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {allocationOptions.map(option => (
-                                  <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </TableCell>;
+          {/* IMPORTANT: Change this div to have a fixed height and overflow-y-auto */}
+          <div className="overflow-x-auto flex-grow h-[calc(100vh-200px)] relative">
+            {/* Table container with sticky header */}
+            <div className="min-w-max">
+              {/* Table with sticky header styles */}
+              <table className="w-full border-collapse table-auto text-xs font-poppins">
+                {/* Sticky header */}
+                <thead className="sticky top-0 z-10 bg-white">
+                  <tr className="h-10">
+                    {displayColumns.map(column => (
+                      <th 
+                        key={column.key} 
+                        onClick={() => handleSortChange(column.key)} 
+                        className={cn(
+                          "whitespace-no-wrap text-xs py-2 cursor-pointer text-center", 
+                          "h-10 px-2 font-semibold text-[#0F172A] text-xs tracking-wide uppercase border-b border-gray-200 break-words min-w-[90px] max-w-[130px]",
+                          sortColumn === column.key ? "bg-blue-50 text-blue-700" : "bg-gray-50"
+                        )}
+                      >
+                        <div className="flex items-center">
+                          {column.title}
+                          {renderSortIndicator(column.key)}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                {/* Scrollable body */}
+                <tbody>
+                  {currentItems.length > 0 ? currentItems.map(item => (
+                  <tr key={item.id} className="h-8 hover:bg-gray-50 border-b">
+                    {displayColumns.map(column => {
+                      if (column.key === 'allocation' && (role === 'ro_admin' || role === 'ho_admin')) {
+                        return <td key={`${item.id}-${column.key}`} className="py-1 text-center p-2 align-middle text-xs">
+                          <Select defaultValue={item.allocation} onValueChange={value => handleAllocationChange(item.id, value)}>
+                            <SelectTrigger className="w-[120px] h-6 text-xs">
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {allocationOptions.map(option => (
+                                <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </td>;
+                      }
+                        if (column.key === 'fieldReport') {
+                          return <td key={`${item.id}-${column.key}`} className="py-1 text-center p-2 align-middle text-xs">
+                            <Button size="sm" className={cn(
+                              "text-white text-xs px-2 py-0.5 h-7 gap-1", 
+                              item.status === 'Completed' 
+                                ? "bg-blue-500 hover:bg-blue-600" 
+                                : "bg-gray-400 hover:bg-gray-500"
+                            )}>
+                              <Download size={12} />
+                              Download
+                            </Button>
+                          </td>;
                         }
-                          if (column.key === 'fieldReport') {
-                            return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
-                              <Button size="sm" className={cn(
-                                "text-white text-xs px-2 py-0.5 h-7 gap-1", 
-                                item.status === 'Completed' 
-                                  ? "bg-blue-500 hover:bg-blue-600" 
-                                  : "bg-gray-400 hover:bg-gray-500"
-                              )}>
-                                <Download size={12} />
-                                Download
-                              </Button>
-                            </TableCell>;
-                          }
-                          if (column.key === 'status') {
-                            return <TableCell key={`${item.id}-${column.key}`} className="py-1 text-center">
-                              <span className={cn("px-2 py-1 rounded text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
-                                {item.status}
-                              </span>
-                            </TableCell>;
-                          }
-                          if (column.key === 'claimNumber') {
-                            return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium text-center">
-                              {item[column.key as keyof AuditData]}
-                            </TableCell>;
-                          }
-                          return <TableCell key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-center">
+                        if (column.key === 'status') {
+                          return <td key={`${item.id}-${column.key}`} className="py-1 p-2 align-middle text-xs">
+                            <span className={cn("px-2 py-1 rounded text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
+                              {item.status}
+                            </span>
+                          </td>;
+                        }
+                        if (column.key === 'claimNumber') {
+                          return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium text-center p-2 align-middle">
                             {item[column.key as keyof AuditData]}
-                          </TableCell>;
-                        })}
-                      </TableRow>
-                    )) : (
-                      <TableRow>
-                        <TableCell colSpan={displayColumns.length} className="h-32 text-center">
-                          No results found
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
+                          </td>;
+                        }
+                        return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-center p-2 align-middle">
+                          {item[column.key as keyof AuditData]}
+                        </td>;
+                      })}
+                    </tr>
+                  )) : (
+                    <tr>
+                      <td colSpan={displayColumns.length} className="h-32 text-center p-2 align-middle text-xs">
+                        No results found
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
           
+          {/* Pagination stays outside the scrollable area */}
           {totalPages > 0 && (
             <div className="py-2 px-2 mt-auto flex flex-col sm:flex-row gap-1 sm:gap-0 sm:justify-between items-center border-t">
               <div className="text-xs text-gray-500 order-2 sm:order-1">

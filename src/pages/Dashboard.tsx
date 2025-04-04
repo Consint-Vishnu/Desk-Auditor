@@ -96,7 +96,7 @@ const Dashboard: React.FC = () => {
       <div className={`flex-1 overflow-hidden transition-all duration-100 ${sidebarExpanded ? 'ml-64' : 'ml-[50px]'}`}>
         <div className="p-2 h-full flex flex-col">
           <div className="bg-white rounded-lg shadow-sm mb-2 p-2">
-            <h1 className="text-xl font-bold text-gray-800 mb-1">
+            <h1 className="text-xl font-bold text-gray-800 mb-1 text-center">
               {getDashboardTitle()}
             </h1>
             

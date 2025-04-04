@@ -1,13 +1,12 @@
-
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
 const Table = React.forwardRef<
   HTMLTableElement,
-  React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => (
-  <div className="relative w-full overflow-auto">
+  React.HTMLAttributes<HTMLTableElement> & { stickyHeader?: boolean }
+>(({ className, stickyHeader = false, ...props }, ref) => (
+  <div className={cn("relative w-full overflow-auto", stickyHeader && "overflow-y-auto")}>
     <table
       ref={ref}
       className={cn("w-full caption-bottom text-sm font-poppins", className)}
@@ -19,9 +18,17 @@ Table.displayName = "Table"
 
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
-  React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => (
-  <thead ref={ref} className={cn("[&_tr]:border-b font-medium text-gray-700", className)} {...props} />
+  React.HTMLAttributes<HTMLTableSectionElement> & { sticky?: boolean }
+>(({ className, sticky = false, ...props }, ref) => (
+  <thead 
+    ref={ref} 
+    className={cn(
+      "[&_tr]:border-b font-medium text-gray-700", 
+      sticky && "sticky top-0 z-10 bg-white",
+      className
+    )} 
+    {...props} 
+  />
 ))
 TableHeader.displayName = "TableHeader"
 
