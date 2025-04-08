@@ -1,119 +1,166 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Download, Filter } from 'lucide-react';
-import FilterPanel from './FilterPanel';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { CalendarIcon, Download, SlidersHorizontal } from 'lucide-react';
 
 interface HeaderFiltersProps {
-  onFilter: (filters: unknown) => void;
+  onFilter: (filters: any) => void;
   onExport: () => void;
+  onAdvancedFilter?: () => void;
+  defaultFilters?: {
+    startDate?: string;
+    endDate?: string;
+    triggerType?: string;
+  };
 }
 
-const HeaderFilters: React.FC<HeaderFiltersProps> = ({ onFilter, onExport }) => {
-  const [hospital, setHospital] = useState('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
-  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState({});
+const HeaderFilters: React.FC<HeaderFiltersProps> = ({ 
+  onFilter, 
+  onExport,
+  onAdvancedFilter,
+  defaultFilters = {}
+}) => {
+  const [startDate, setStartDate] = useState<string>(defaultFilters.startDate || format(new Date(), 'yyyy-MM-dd'));
+  const [endDate, setEndDate] = useState<string>(defaultFilters.endDate || format(new Date(), 'yyyy-MM-dd'));
+  const [triggerType, setTriggerType] = useState<string>(defaultFilters.triggerType || 'Ai');
+  
+  const [startDateOpen, setStartDateOpen] = useState(false);
+  const [endDateOpen, setEndDateOpen] = useState(false);
 
-  const handleFilterApply = (filters: any) => {
-    setAppliedFilters(filters);
+  useEffect(() => {
+    if (defaultFilters.startDate) {
+      setStartDate(defaultFilters.startDate);
+    }
+    if (defaultFilters.endDate) {
+      setEndDate(defaultFilters.endDate);
+    }
+    if (defaultFilters.triggerType) {
+      setTriggerType(defaultFilters.triggerType);
+    }
+  }, [defaultFilters]);
+
+  const handleApplyFilter = () => {
     onFilter({
-      hospital,
-      dateFrom,
-      dateTo,
-      ...filters
+      startDate,
+      endDate,
+      triggerType
     });
   };
-
-  const handleBasicFilterChange = () => {
-    onFilter({
-      hospital,
-      dateFrom,
-      dateTo,
-      ...appliedFilters
-    });
+  
+  // Parse string date to Date object
+  const parseDate = (dateString: string): Date => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
   };
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row md:items-end gap-4 mb-2">
-        <div className="flex flex-col md:flex-row md:items-end gap-4 flex-1">
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700">Hospital Name:</label>
-            <Select value={hospital} onValueChange={(value) => {
-              setHospital(value);
-              handleBasicFilterChange();
-            }}>
-              <SelectTrigger className="w-full md:w-[180px] h-8 text-xs">
-                <SelectValue placeholder="Select Hospital" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="abc_hospital">ABC Hospital</SelectItem>
-                <SelectItem value="vincent_hospital">Vincent Hospital</SelectItem>
-                <SelectItem value="region_1">Region 1</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700">Date Range:</label>
-            <div className="flex items-center gap-2">
-              <Input
-                type="date"
-                placeholder="From"
-                value={dateFrom}
-                onChange={(e) => {
-                  setDateFrom(e.target.value);
-                  handleBasicFilterChange();
+    <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-end gap-2 flex-1">
+        <div className="flex flex-col space-y-1 min-w-[150px]">
+          <Label htmlFor="start_date" className="text-xs">Start Date</Label>
+          <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal h-9 px-3 py-1"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {startDate}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={parseDate(startDate)}
+                onSelect={(date) => {
+                  if (date) {
+                    setStartDate(format(date, 'yyyy-MM-dd'));
+                    setStartDateOpen(false);
+                  }
                 }}
-                className="w-full md:w-[150px] h-8 text-xs"
+                initialFocus
               />
-              <span className="text-gray-500 text-xs">to</span>
-              <Input
-                type="date"
-                placeholder="To"
-                value={dateTo}
-                onChange={(e) => {
-                  setDateTo(e.target.value);
-                  handleBasicFilterChange();
-                }}
-                className="w-full md:w-[150px] h-8 text-xs"
-              />
-            </div>
-          </div>
+            </PopoverContent>
+          </Popover>
         </div>
-
-        <div className="flex items-center gap-2 self-end ml-auto">
+        
+        <div className="flex flex-col space-y-1 min-w-[150px]">
+          <Label htmlFor="end_date" className="text-xs">End Date</Label>
+          <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start text-left font-normal h-9 px-3 py-1"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {endDate}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={parseDate(endDate)}
+                onSelect={(date) => {
+                  if (date) {
+                    setEndDate(format(date, 'yyyy-MM-dd'));
+                    setEndDateOpen(false);
+                  }
+                }}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        
+        <div className="flex flex-col space-y-1 min-w-[120px]">
+          <Label htmlFor="trigger_type" className="text-xs">Trigger Type</Label>
+          <Select value={triggerType} onValueChange={setTriggerType}>
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Trigger Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Ai">AI</SelectItem>
+              <SelectItem value="Manual">Manual</SelectItem>
+              <SelectItem value="All">All</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <Button 
+          variant="default" 
+          size="sm" 
+          className="bg-blue-600 hover:bg-blue-700 text-white h-9"
+          onClick={handleApplyFilter}
+        >
+          Apply Filter
+        </Button>
+        
+        {onAdvancedFilter && (
           <Button 
             variant="outline" 
-            size="sm"
-            onClick={() => setIsFilterPanelOpen(true)}
-            className="flex items-center gap-1 h-8 text-xs"
+            size="sm" 
+            className="border-blue-200 text-blue-600 hover:bg-blue-50 h-9"
+            onClick={onAdvancedFilter}
           >
-            <Filter size={14} />
-            More Filters
+            <SlidersHorizontal className="w-4 h-4 mr-1" /> More Filters
           </Button>
-          <Button 
-            size="sm"
-            onClick={onExport}
-            className="flex items-center gap-1 h-8 text-xs bg-blue-500 hover:bg-blue-600"
-          >
-            <Download size={14} />
-            Download Excel
-          </Button>
-        </div>
+        )}
       </div>
-
-      <FilterPanel 
-        isOpen={isFilterPanelOpen}
-        onClose={() => setIsFilterPanelOpen(false)}
-        onApplyFilters={handleFilterApply}
-      />
-    </>
+      
+      <Button 
+        variant="outline" 
+        size="sm" 
+        className="border-blue-200 text-blue-600 hover:bg-blue-50 h-9"
+        onClick={onExport}
+      >
+        <Download className="w-4 h-4 mr-1" /> Export
+      </Button>
+    </div>
   );
 };
 

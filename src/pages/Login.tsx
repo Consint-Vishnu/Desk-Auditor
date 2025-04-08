@@ -1,7 +1,5 @@
-
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth, UserRole } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,15 +8,13 @@ import { toast } from "sonner";
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState<UserRole>('desk_auditor');
   const { login, loading } = useAuth();
-  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email.trim()) {
-      toast.error('Please enter an email address');
+      toast.error('Please enter an email address or username');
       return;
     }
     
@@ -27,14 +23,12 @@ const Login: React.FC = () => {
       return;
     }
     
-    login(email, password, selectedRole);
+    try {
+      await login(email, password);
+    } catch (error: any) {
+      toast.error(error.message || 'Login failed. Please try again.');
+    }
   };
-
-  const roleOptions: { value: UserRole; label: string }[] = [
-    { value: 'ro_admin', label: 'RO Admin' },
-    { value: 'ho_admin', label: 'HO Admin' },
-    { value: 'desk_auditor', label: 'Desk Auditor' }
-  ];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -46,15 +40,14 @@ const Login: React.FC = () => {
         
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Username / Email</Label>
             <Input
               id="email"
-              type="email"
-              placeholder="name@example.com"
+              type="text"
+              placeholder="Enter your username or email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full"
-              autoComplete="email"
               required
             />
           </div>
@@ -71,25 +64,6 @@ const Login: React.FC = () => {
               autoComplete="current-password"
               required
             />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="role">Login as</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {roleOptions.map((role) => (
-                <Button
-                  key={role.value}
-                  type="button"
-                  variant={selectedRole === role.value ? 'default' : 'outline'}
-                  onClick={() => setSelectedRole(role.value)}
-                  className={`transition-all ${
-                    selectedRole === role.value ? 'bg-navy text-white' : 'text-gray-700'
-                  }`}
-                >
-                  {role.label}
-                </Button>
-              ))}
-            </div>
           </div>
           
           <Button 

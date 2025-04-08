@@ -30,17 +30,32 @@ interface AuditData {
   fieldReport: string;
 }
 
+interface PaginationProps {
+  page: number;
+  pageSize: number;
+  total: number;
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (pageSize: number) => void;
+}
+
 interface AuditTableProps {
   data: AuditData[];
   loading?: boolean;
+  subUsers?: any[];
+  userRole?: UserRole;
+  paginationProps: PaginationProps;
 }
 
 type SortDirectionType = 'asc' | 'desc' | null;
 
 const AuditTable: React.FC<AuditTableProps> = ({
   data,
-  loading = false
+  loading = false,
+  subUsers = [],
+  userRole,
+  paginationProps
 }) => {
+  const { page, pageSize, total, onPageChange, onPageSizeChange } = paginationProps;
   const [currentPage, setCurrentPage] = useState(1);
   const [search, setSearch] = useState('');
   const [sortColumn, setSortColumn] = useState<string>('claimNumber');
@@ -58,13 +73,19 @@ const AuditTable: React.FC<AuditTableProps> = ({
     }, {
       key: 'claimDate',
       title: 'Claim Date'
-    }, {
-      key: 'hospitalName',
-      title: 'Hospital Name'
-    }, {
-      key: 'hospitalLocation',
-      title: 'Hospital Location'
-    }, {
+    }, 
+    {
+      key: 'Id',
+      title: 'Id'
+    },
+    // {
+    //   key: 'hospitalName',
+    //   title: 'Hospital Name'
+    // }, {
+    //   key: 'hospitalLocation',
+    //   title: 'Hospital Location'
+    // }, 
+    {
       key: 'htpaLocation',
       title: 'HTPA Location'
     },
@@ -84,10 +105,12 @@ const AuditTable: React.FC<AuditTableProps> = ({
     }, {
       key: 'claimStatus',
       title: 'Claim Status'
-    }, {
-      key: 'status',
-      title: 'Status'
-    }, {
+    },
+    //  {
+    //   key: 'status',
+    //   title: 'Status'
+    // }, 
+    {
       key: 'deskAuditReferralDate',
       title: 'Desk Audit Referral Date'
     }, {
@@ -104,15 +127,16 @@ const AuditTable: React.FC<AuditTableProps> = ({
       return [...commonColumns, {
         key: 'allocation',
         title: 'Allocation'
-      }, {
-        key: 'fieldReport',
-        title: 'Field Report'
-      }];
+      }]
+      // {
+      //   key: 'fieldReport',
+      //   title: 'Field Report'
+      // }];
     }
-    return [...commonColumns, {
-      key: 'fieldReport',
-      title: 'Field Report'
-    }];
+    // return [...commonColumns, {
+    //   key: 'fieldReport',
+    //   title: 'Field Report'
+    // }];
   }, [role]);
 
   const defaultVisibleColumns = useMemo(() => {
@@ -122,8 +146,8 @@ const AuditTable: React.FC<AuditTableProps> = ({
       hospitalName: true,
       hospitalLocation: true,
       htpaLocation: true,
-      // dateOfAdmission: true,
-      // dateOfDischarge: true,
+      dateOfAdmission: true,
+      dateOfDischarge: true,
       status: true,
       fieldReport: true
     };
@@ -180,22 +204,31 @@ const AuditTable: React.FC<AuditTableProps> = ({
   };
 
   const handleAllocationChange = (id: string, value: string) => {
-    console.log(`Allocation changed for ${id} to ${value}`);
+    console.log(`Allocation changed for claim ${id} to user ${value}`);
+    // Here you would typically make an API call to update the allocation
   };
 
   const getAllocationOptions = () => {
-    if (role === 'ho_admin') {
-      return [
-        { value: 'ro_admin_1', label: 'RO Admin 1' },
-        { value: 'ro_admin_2', label: 'RO Admin 2' },
-        { value: 'ro_admin_3', label: 'RO Admin 3' },
-      ];
-    } else if (role === 'ro_admin') {
-      return [
-        { value: 'desk_auditor_1', label: 'Desk Auditor 1' },
-        { value: 'desk_auditor_2', label: 'Desk Auditor 2' },
-        { value: 'desk_auditor_3', label: 'Desk Auditor 3' },
-      ];
+    console.log('SubUsers received:', subUsers);
+    if (!subUsers || subUsers.length === 0) {
+      console.log('No subusers available');
+      return [];
+    }
+
+    if (userRole === 'ho_admin') {
+      return subUsers
+        .filter(user => user.role === 'ro_admin')
+        .map(user => ({
+          value: user.id,
+          label: user.username 
+        }));
+    } else if (userRole === 'ro_admin') {
+      return subUsers
+        .filter(user => user.role === 'desk_auditor')
+        .map(user => ({
+          value: user.id,
+          label: user.username
+        }));
     }
     return [];
   };
@@ -343,8 +376,9 @@ const AuditTable: React.FC<AuditTableProps> = ({
                             </span>
                           </td>;
                         }
+                        // console.log('item',item);
                         if (column.key === 'claimNumber') {
-                          return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium text-center p-2 align-middle">
+                          return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium p-2 align-middle">
                             {item[column.key as keyof AuditData]}
                           </td>;
                         }
