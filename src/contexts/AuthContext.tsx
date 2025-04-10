@@ -1,7 +1,9 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
+import { login as apiLogin, logout as apiLogout } from '../services/api/authService';
+import { getTokens } from '../services/api/apiClient';
 
 export type UserRole = 'ro_admin' | 'ho_admin' | 'desk_auditor';
 
@@ -15,7 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string, role: UserRole) => void;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -23,15 +25,14 @@ interface AuthContextType {
 const defaultContext: AuthContextType = {
   user: null,
   loading: true,
-  login: () => {},
+  login: async () => {},
   logout: () => {},
   isAuthenticated: false,
 };
 
 const AuthContext = createContext<AuthContextType>(defaultContext);
 
-export const 
-useAuth = () => useContext(AuthContext);
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -41,7 +42,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Check if user is logged in from localStorage on initial load
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const { accessToken } = getTokens();
+    
+    if (storedUser && accessToken) {
       try {
         setUser(JSON.parse(storedUser));
       } catch (e) {
@@ -51,41 +54,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const login = (email: string, password: string, role: UserRole) => {
-    // In a real app, you would validate credentials against a backend
-    // Here we're just mocking the login process
-    
-    // Simulate a login delay
+  const login = async (email: string, password: string) => {
     setLoading(true);
     
-    setTimeout(() => {
-      // Create a mock user based on the role
-      const mockUser: User = {
-        id: Math.random().toString(36).substring(2, 9),
-        name: role === 'ro_admin' 
-          ? 'RO Admin User'
-          : role === 'ho_admin'
-            ? 'HO Admin User'
-            : 'Desk Auditor User',
-        email,
-        role,
-      };
+    try {
+      // Call API login service
+      const userData = await apiLogin(email, password);
       
       // Save user to state and localStorage
-      setUser(mockUser);
-      localStorage.setItem('user', JSON.stringify(mockUser));
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
       
       // Complete login
+      toast.success(`Logged in as ${userData.name}`);
+      navigate(`/dashboard/${userData.role}`);
+    } catch (error: any) {
+      toast.error(error.message || "Login failed. Please try again.");
+    } finally {
       setLoading(false);
-      
-      // Navigate to appropriate dashboard based on role
-      toast.success(`Logged in as ${mockUser.name}`);
-      
-      navigate(`/dashboard/${role}`);
-    }, 1000);
+    }
   };
 
   const logout = () => {
+    // Call API logout
+    apiLogout();
+    
     // Clear user from state and localStorage
     setUser(null);
     localStorage.removeItem('user');
