@@ -1,22 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Check, X, MessageSquare, Search, ChevronDown } from 'lucide-react';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Check, X, MessageSquare } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from "@/components/ui/input";
 import { useToast } from '@/hooks/use-toast';
 import {
   AlertDialog,
@@ -29,7 +18,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { fetchClaimFindings, fetchRules, Rule, addFinding } from '@/services/api/auditService';
+import { fetchClaimFindings, fetchRules, Rule, addFinding, addRule } from '@/services/api/auditService';
 
 interface Finding {
   id: string;
@@ -57,6 +46,8 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
   const [openCombobox, setOpenCombobox] = useState(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const [rules, setRules] = useState<Rule[]>([]);
+  const [isNewRuleDialogOpen, setIsNewRuleDialogOpen] = useState(false);
+  const [newRuleName, setNewRuleName] = useState("");
   const { toast } = useToast();
 
   // Load any existing findings for this claim
@@ -163,6 +154,32 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
           variant: "destructive",
         });
       }
+    }
+  };
+
+  const handleCreateRule = async () => {
+    if (!newRuleName.trim()) return;
+
+    try {
+      const response = await addRule({ rule_name: newRuleName.trim() });
+      if (response.status) {
+        // Refresh rules list
+        const rulesResponse = await fetchRules();
+        setRules(rulesResponse.data);
+        
+        setNewRuleName("");
+        setIsNewRuleDialogOpen(false);
+        toast({
+          title: "Success",
+          description: "New finding rule created successfully",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create new rule",
+        variant: "destructive",
+      });
     }
   };
 
@@ -286,7 +303,7 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
                 
                 {/* New finding input row - fixed at bottom */}
                 <div className="grid grid-cols-12 border-t py-2 px-3 bg-gray-50 items-center">
-                  <div className="col-span-9">
+                  <div className="col-span-7">
                     <Select 
                       value={selectedFinding?.ruleName || ''} 
                       onValueChange={handleFindingSelect}
@@ -303,7 +320,17 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="col-span-3 flex items-center justify-center pl-2">
+                  <div className="col-span-2 pl-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full h-8 text-xs"
+                      onClick={() => setIsNewRuleDialogOpen(true)}
+                    >
+                      Create New
+                    </Button>
+                  </div>
+                  <div className="col-span-3 pl-2">
                     <Button 
                       size="sm"
                       variant="default"
@@ -374,6 +401,40 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* New Rule Dialog */}
+      <Dialog open={isNewRuleDialogOpen} onOpenChange={setIsNewRuleDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New Finding Rule</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label htmlFor="ruleName" className="text-sm font-medium">
+                Rule Name
+              </label>
+              <Input
+                id="ruleName"
+                value={newRuleName}
+                onChange={(e) => setNewRuleName(e.target.value)}
+                placeholder="Enter new finding rule..."
+                className="col-span-3"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsNewRuleDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleCreateRule}
+              disabled={!newRuleName.trim()}
+            >
+              Create Rule
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

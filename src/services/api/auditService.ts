@@ -51,6 +51,52 @@ export interface DeskAuditResponse {
   status: boolean;
 }
 
+export interface ClaimFinding {
+  ClaimId: string;
+  ClaimedDate: string;
+  ClaimStatus: string | null;
+  FraudTrigger: string;
+}
+
+export interface ClaimFindingsResponse {
+  data: ClaimFinding[];
+  message: string;
+  status: boolean;
+}
+
+export interface Rule {
+  RuleName: string;
+  RuleId: string;
+}
+
+export interface RulesResponse {
+  data: Rule[];
+  message: string;
+  status: boolean;
+}
+
+export interface AddFindingRequest {
+  rule_id: string;
+  claim_id: string;
+  fraud_trigger: string;
+}
+
+export interface AddFindingResponse {
+  data: any[];
+  message: string;
+  status: boolean;
+}
+
+export interface AddRuleRequest {
+  rule_name: string;
+}
+
+export interface AddRuleResponse {
+  data: any;
+  message: string;
+  status: boolean;
+}
+
 export const fetchDeskAudits = async (params: DeskAuditParams): Promise<DeskAuditResponse> => {
   try {
     const response = await apiClient.get<DeskAuditResponse>('/desk-audit/', { 
@@ -69,19 +115,6 @@ export const fetchDeskAudits = async (params: DeskAuditParams): Promise<DeskAudi
   }
 };
 
-export interface ClaimFinding {
-  ClaimId: string;
-  ClaimedDate: string;
-  ClaimStatus: string | null;
-  FraudTrigger: string;
-}
-
-export interface ClaimFindingsResponse {
-  data: ClaimFinding[];
-  message: string;
-  status: boolean;
-}
-
 export const fetchClaimFindings = async (claimId: string): Promise<ClaimFindingsResponse> => {
   try {
     const response = await apiClient.get<ClaimFindingsResponse>(`/desk-audit/${claimId}/`);
@@ -92,17 +125,6 @@ export const fetchClaimFindings = async (claimId: string): Promise<ClaimFindings
     throw new Error(error.response?.data?.message || 'Failed to fetch claim findings');
   }
 };
-
-export interface Rule {
-  RuleName: string;
-  RuleId: string;
-}
-
-export interface RulesResponse {
-  data: Rule[];
-  message: string;
-  status: boolean;
-}
 
 export const fetchRules = async (): Promise<RulesResponse> => {
   try {
@@ -115,18 +137,6 @@ export const fetchRules = async (): Promise<RulesResponse> => {
   }
 };
 
-export interface AddFindingRequest {
-  rule_id: string;
-  claim_id: string;
-  fraud_trigger: string;
-}
-
-export interface AddFindingResponse {
-  data: any[];
-  message: string;
-  status: boolean;
-}
-
 export const addFinding = async (request: AddFindingRequest): Promise<AddFindingResponse> => {
   try {
     const response = await apiClient.post<AddFindingResponse>('/finding/add-finding/', request);
@@ -136,6 +146,16 @@ export const addFinding = async (request: AddFindingRequest): Promise<AddFinding
   } catch (error: any) {
     console.error('Error adding finding:', error);
     throw new Error(error.response?.data?.message || 'Failed to add finding');
+  }
+};
+
+export const addRule = async (request: AddRuleRequest): Promise<AddRuleResponse> => {
+  try {
+    const response = await apiClient.post<AddRuleResponse>('/finding/add-rules/', request);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error adding rule:', error);
+    throw new Error(error.response?.data?.message || 'Failed to add rule');
   }
 };
 
