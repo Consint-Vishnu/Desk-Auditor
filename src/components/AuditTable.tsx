@@ -78,17 +78,17 @@ const AuditTable: React.FC<AuditTableProps> = ({
       key: 'claimDate',
       title: 'Claim Date'
     }, 
-    {
-      key: 'Id',
-      title: 'Id'
-    },
     // {
-    //   key: 'hospitalName',
-    //   title: 'Hospital Name'
-    // }, {
-    //   key: 'hospitalLocation',
-    //   title: 'Hospital Location'
-    // }, 
+    //   key: 'Id',
+    //   title: 'Id'
+    // },
+    {
+      key: 'hospitalName',
+      title: 'Hospital Name'
+    }, {
+      key: 'hospitalLocation',
+      title: 'Hospital Location'
+    }, 
     {
       key: 'htpaLocation',
       title: 'HTPA Location'
@@ -110,6 +110,10 @@ const AuditTable: React.FC<AuditTableProps> = ({
       key: 'claimStatus',
       title: 'Claim Status'
     },
+    // {
+    //   key: 'HospitalAddress',
+    //   title: 'Hospital Address'
+    // },
     //  {
     //   key: 'status',
     //   title: 'Status'
@@ -316,7 +320,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
         </div>
       ) : (
         <>
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-1 pb-1 gap-1 border-b">
+          <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between p-1 pb-1 gap-1 border-b">
             <div className="relative w-full sm:w-[200px]">
               <Search size={15} className="absolute left-2.5 top-1/2 transform -translate-y-1/2 text-gray-500" />
               <Input type="text" placeholder="Search claims..." value={search} onChange={e => setSearch(e.target.value)} className="pl-8 h-7 text-xs w-full" />
@@ -383,6 +387,7 @@ const AuditTable: React.FC<AuditTableProps> = ({
                             </Button>
                           </td>;
                         }
+                        console.log(item)
                         if (column.key === 'status') {
                           return <td key={`${item.id}-${column.key}`} className="py-1 p-2 align-middle text-xs">
                             <span className={cn("px-2 py-1 rounded text-xs font-medium inline-block", getStatusBadgeClass(item.status))}>
@@ -390,10 +395,30 @@ const AuditTable: React.FC<AuditTableProps> = ({
                             </span>
                           </td>;
                         }
+                        if (column.key === 'hospitalName') {
+                          return <td key={`${item.id}-${column.key}`} className="py-1 p-2 align-middle text-xs text-center">
+                            {item.hospitalName || 'No Data'}
+                          </td>;
+                        }
+                        if (column.key === 'fraudTriggers') {
+                          return <td key={`${item.id}-${column.key}`} className="py-1 p-2 align-middle text-xs">
+                            {item.fraudTriggers || 'No Data'}
+                          </td>;
+                        }
+                        // if (column.key === 'hospitalAddress') {
+                        //   return <td key={`${item.id}-${column.key}`} className="py-1 p-2 align-middle text-xs">
+                        //     {item.hospitalAddress || 'No Data'}
+                        //   </td>;
+                        // }
                         if (column.key === 'claimNumber') {
                           return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium p-2 align-middle cursor-pointer hover:underline" onClick={() => handleClaimClick(item)}>
-                            {item[column.key as keyof AuditData]}
+                            {item.claimNumber}
                           </td>;
+                        }
+                        if (column.key === 'hospitalLocation') {
+                          return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-center p-2 align-middle">
+                          {item.hospitalLocation || 'No Data'}
+                        </td>;
                         }
                         return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-center p-2 align-middle">
                           {item[column.key as keyof AuditData]}
