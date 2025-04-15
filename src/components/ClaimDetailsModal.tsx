@@ -75,7 +75,7 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
     };
 
     loadFindings();
-  }, [claimData?.claimNumber]); // Also changed dependency from id to claimNumber
+  }, [claimData.claimNumber, toast]); // Also changed dependency from id to claimNumber
 
   // Load rules
   useEffect(() => {
@@ -94,7 +94,7 @@ const ClaimDetailsModal: React.FC<ClaimDetailsModalProps> = ({
     };
 
     loadRules();
-  }, []);
+  }, [toast]);
 
   const handleFindingSelect = (value: string) => {
     const selectedRule = rules.find(rule => rule.RuleName === value);
