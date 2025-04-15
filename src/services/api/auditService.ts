@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { SetStateAction } from 'react';
 import apiClient from './apiClient';
@@ -67,3 +68,74 @@ export const fetchDeskAudits = async (params: DeskAuditParams): Promise<DeskAudi
     throw new Error(error.response?.data?.message || 'Failed to fetch audit data');
   }
 };
+
+export interface ClaimFinding {
+  ClaimId: string;
+  ClaimedDate: string;
+  ClaimStatus: string | null;
+  FraudTrigger: string;
+}
+
+export interface ClaimFindingsResponse {
+  data: ClaimFinding[];
+  message: string;
+  status: boolean;
+}
+
+export const fetchClaimFindings = async (claimId: string): Promise<ClaimFindingsResponse> => {
+  try {
+    const response = await apiClient.get<ClaimFindingsResponse>(`/desk-audit/${claimId}/`);
+    // console.log(response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching claim findings:', error);
+    throw new Error(error.response?.data?.message || 'Failed to fetch claim findings');
+  }
+};
+
+export interface Rule {
+  RuleName: string;
+  RuleId: string;
+}
+
+export interface RulesResponse {
+  data: Rule[];
+  message: string;
+  status: boolean;
+}
+
+export const fetchRules = async (): Promise<RulesResponse> => {
+  try {
+    const response = await apiClient.get<RulesResponse>('/finding/get-rules/');
+    // console.log(response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching rules:', error);
+    throw new Error(error.response?.data?.message || 'Failed to fetch rules');
+  }
+};
+
+export interface AddFindingRequest {
+  rule_id: string;
+  claim_id: string;
+  fraud_trigger: string;
+}
+
+export interface AddFindingResponse {
+  data: any[];
+  message: string;
+  status: boolean;
+}
+
+export const addFinding = async (request: AddFindingRequest): Promise<AddFindingResponse> => {
+  try {
+    const response = await apiClient.post<AddFindingResponse>('/finding/add-finding/', request);
+    console.log(request.rule_id)
+    console.log(response.data);
+    return response.data;
+  } catch (error: any) {
+    console.error('Error adding finding:', error);
+    throw new Error(error.response?.data?.message || 'Failed to add finding');
+  }
+};
+

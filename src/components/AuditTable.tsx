@@ -9,6 +9,7 @@ import { ArrowDown, ArrowUp, Search, Download } from 'lucide-react';
 import ColumnVisibilityDropdown from './ColumnVisibilityDropdown';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
+import ClaimDetailsModal from './ClaimDetailsModal';
 
 interface AuditData {
   id: string;
@@ -66,6 +67,8 @@ const AuditTable: React.FC<AuditTableProps> = ({
   } = useAuth();
   const role = user?.role as UserRole;
   const itemsPerPage = 10;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedClaim, setSelectedClaim] = useState<AuditData | null>(null);
 
   const allColumns = useMemo(() => {
     const commonColumns = [{
@@ -295,6 +298,16 @@ const AuditTable: React.FC<AuditTableProps> = ({
 
   const allocationOptions = getAllocationOptions();
 
+  const handleClaimClick = (claim: AuditData) => {
+    setSelectedClaim(claim);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedClaim(null);
+  };
+
   return (
     <div className="w-full flex flex-col h-full">
       {loading ? (
@@ -377,9 +390,8 @@ const AuditTable: React.FC<AuditTableProps> = ({
                             </span>
                           </td>;
                         }
-                        // console.log('item',item);
                         if (column.key === 'claimNumber') {
-                          return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium p-2 align-middle">
+                          return <td key={`${item.id}-${column.key}`} className="text-xs whitespace-nowrap py-1 text-blue-600 font-medium p-2 align-middle cursor-pointer hover:underline" onClick={() => handleClaimClick(item)}>
                             {item[column.key as keyof AuditData]}
                           </td>;
                         }
@@ -447,6 +459,15 @@ const AuditTable: React.FC<AuditTableProps> = ({
                 </PaginationContent>
               </Pagination>
             </div>
+          )}
+
+          {/* Claim Details Modal */}
+          {selectedClaim && (
+            <ClaimDetailsModal 
+              isOpen={isModalOpen} 
+              onClose={closeModal} 
+              claimData={selectedClaim} 
+            />
           )}
         </>
       )}
